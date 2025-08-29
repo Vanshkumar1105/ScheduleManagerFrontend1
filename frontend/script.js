@@ -47,13 +47,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Complete task
+  // Handle complete and delete
   taskList.addEventListener("click", async (e) => {
+    const taskId = e.target.dataset.id;
+    if (!taskId) return;
+
+    // Complete task
     if (e.target.classList.contains("complete-btn")) {
-      const taskId = e.target.dataset.id;
       try {
         await fetch(`${API_BASE}/tasks/${taskId}/complete`, { method: "PUT" });
         e.target.parentElement.classList.toggle("completed");
+
+        // Update calendar event (optional: change color for completed)
+        const event = calendar.getEventById(taskId);
+        if (event) event.setProp('color', e.target.parentElement.classList.contains('completed') ? 'gray' : '');
       } catch (err) {
         console.error("Error completing task:", err);
       }
@@ -61,20 +68,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Delete task
     if (e.target.classList.contains("delete-btn")) {
-      const taskId = e.target.dataset.id;
       try {
         await fetch(`${API_BASE}/tasks/${taskId}`, { method: "DELETE" });
         e.target.parentElement.remove();
+
+        // Remove from calendar
+        const event = calendar.getEventById(taskId);
+        if (event) event.remove();
       } catch (err) {
         console.error("Error deleting task:", err);
       }
     }
   });
 
-  // Function to add task to DOM
+  // Add task to DOM
   function addTaskToDOM(task) {
     const li = document.createElement("li");
-    li.textContent = `${task.name} - ${task.date} ${task.time}`;
+    li.textContent = `${task.name} - ${task.date}${task.time ? " " + task.time : ""}`;
     li.className = task.completed ? "completed" : "";
 
     const completeBtn = document.createElement("button");
@@ -92,8 +102,17 @@ document.addEventListener("DOMContentLoaded", () => {
     taskList.appendChild(li);
   }
 
-  // Dummy function for calendar integration
+  // Add task to calendar
   function addTaskToCalendar(task) {
-    // Implement your calendar logic here
+    if (!task.date) return;
+    let start = task.date;
+    if (task.time) start += "T" + task.time;
+
+    calendar.addEvent({
+      id: task._id,
+      title: task.name,
+      start,
+      color: task.completed ? 'gray' : '' // completed tasks gray
+    });
   }
 });
