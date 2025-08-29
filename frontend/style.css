@@ -1,0 +1,136 @@
+/* General Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #89f7fe, #66a6ff);
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+.container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 30px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+h1, h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #444;
+}
+
+/* Task Input Section */
+.input-section {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.input-section input, .input-section button {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+#addTask {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#addTask:hover {
+  background: #43a047;
+}
+
+/* Task List */
+#taskList {
+  list-style: none;
+  padding: 0;
+}
+
+#taskList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  margin: 8px 0;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+#taskList li.completed span {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.task-buttons button {
+  border: none;
+  background: none;
+  font-size: 18px;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.task-buttons button:hover {
+  transform: scale(1.2);
+}
+
+/* Calendar View */
+#calendar {
+  margin-top: 25px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* FullCalendar custom theme */
+.fc-toolbar-title {
+  font-size: 20px !important;
+  font-weight: bold;
+  color: #333;
+}
+
+.fc-button {
+  background: #4CAF50 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  color: white !important;
+  transition: 0.3s;
+}
+
+.fc-button:hover {
+  background: #43a047 !important;
+}
+
+.fc-daygrid-day {
+  background: #fdfdfd;
+  transition: background 0.3s;
+}
+
+.fc-daygrid-day:hover {
+  background: #f1f8e9;
+}
+
+.fc-event {
+  background: #66a6ff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 4px 6px;
+  font-size: 14px;
+}
+
+.fc-day-today {
+  background: #fff3cd !important;
+}

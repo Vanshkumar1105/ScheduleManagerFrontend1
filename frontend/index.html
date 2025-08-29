@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Manager</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>📅 My Schedule Manager</h1>
+    <form id="taskForm" class="input-section">
+      <input type="text" id="taskInput" placeholder="Enter task" required>
+      <input type="date" id="dateInput">
+      <input type="time" id="timeInput">
+      <button type="submit" id="addTask">➕ Add Task</button>
+    </form>
+
+    <h2>📝 Task List</h2>
+    <ul id="taskList"></ul>
+
+    <h2>📌 Calendar View</h2>
+    <div id="calendar"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
