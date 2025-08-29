@@ -6,6 +6,12 @@ require("dotenv").config(); // Load environment variables
 const app = express();
 app.use(express.json());
 
+
+const cors = require("cors");
+app.use(cors({
+  origin: "*", // or your Netlify URL
+}));
+
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
