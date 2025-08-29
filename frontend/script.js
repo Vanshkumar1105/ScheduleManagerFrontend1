@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   calendar.render();
 
-  // Load tasks from backend
+  // Load existing tasks from backend
   fetch(`${API_BASE}/tasks`)
     .then(res => res.json())
     .then(tasks => {
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Handle complete and delete
+  // Complete or delete tasks
   taskList.addEventListener("click", async (e) => {
     const taskId = e.target.dataset.id;
     if (!taskId) return;
@@ -72,7 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
         e.target.parentElement.classList.toggle("completed");
 
         const event = calendar.getEventById(taskId);
-        if (event) event.setProp('color', e.target.parentElement.classList.contains('completed') ? 'gray' : '');
+        if (event) {
+          event.setProp('color', e.target.parentElement.classList.contains('completed') ? 'gray' : '#66a6ff');
+        }
       } catch (err) {
         console.error("Error completing task:", err);
       }
@@ -123,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
       id: task._id,
       title: task.name,
       start,
-      color: task.completed ? 'gray' : ''
+      color: task.completed ? 'gray' : '#66a6ff'
     });
   }
 });
