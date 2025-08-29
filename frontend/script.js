@@ -5,28 +5,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const timeInput = document.getElementById("timeInput");
   const taskList = document.getElementById("taskList");
 
-  // ✅ Replace with your Render backend URL
+  // ✅ Use your Render backend URL
   const API_BASE = "https://schedulemanagerbackend-49kg.onrender.com";
 
   // Initialize FullCalendar
   const calendarEl = document.getElementById("calendar");
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
+    initialView: "dayGridMonth",
     height: 500,
-    events: [], 
+    events: [],
   });
   calendar.render();
 
   // Load tasks from backend
-  fetch(`${API_BASE}/tasks`)
-    .then(res => res.json())
-    .then(tasks => {
-      tasks.forEach(task => {
+  async function loadTasks() {
+    try {
+      const res = await fetch(`${API_BASE}/tasks`);
+      const tasks = await res.json();
+      taskList.innerHTML = "";
+      tasks.forEach((task) => {
         addTaskToDOM(task);
         addTaskToCalendar(task);
       });
-    })
-    .catch(err => console.error("Error loading tasks:", err));
+    } catch (err) {
+      console.error("Error loading tasks:", err);
+    }
+  }
+
+  loadTasks();
 
   // Add new task
   taskForm.addEventListener("submit", async (e) => {
@@ -41,8 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({
           name: taskText,
           date: dateInput.value,
-          time: timeInput.value
-        })
+          time: timeInput.value,
+        }),
       });
 
       const newTask = await res.json();
@@ -57,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Handle complete and delete
+  // Complete and Delete task
   taskList.addEventListener("click", async (e) => {
     const taskId = e.target.dataset.id;
     if (!taskId) return;
@@ -71,9 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const li = e.target.parentElement;
         li.classList.toggle("completed", updatedTask.completed);
 
-        // Update calendar event color
         const event = calendar.getEventById(taskId);
-        if (event) event.setProp('color', updatedTask.completed ? 'gray' : '#66a6ff');
+        if (event) event.setProp("color", updatedTask.completed ? "gray" : "#66a6ff");
       } catch (err) {
         console.error("Error completing task:", err);
       }
@@ -85,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
         await fetch(`${API_BASE}/tasks/${taskId}`, { method: "DELETE" });
         e.target.parentElement.remove();
 
-        // Remove from calendar
         const event = calendar.getEventById(taskId);
         if (event) event.remove();
       } catch (err) {
@@ -125,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
       id: task._id,
       title: task.name,
       start,
-      color: task.completed ? 'gray' : '#66a6ff'
+      color: task.completed ? "gray" : "#66a6ff",
     });
   }
 });
