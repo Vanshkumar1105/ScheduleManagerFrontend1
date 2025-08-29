@@ -5,22 +5,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const timeInput = document.getElementById("timeInput");
   const taskList = document.getElementById("taskList");
 
+  // ✅ Replace with your Render backend URL
   const API_BASE = "https://schedulemanagerbackend-49kg.onrender.com";
 
   // Initialize FullCalendar
-  const calendarEl = document.getElementById('calendar');
+  const calendarEl = document.getElementById("calendar");
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
-    height: 600,
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
-    }
+    height: 500,
+    events: [], 
   });
   calendar.render();
 
-  // Load existing tasks from backend
+  // Load tasks from backend
   fetch(`${API_BASE}/tasks`)
     .then(res => res.json())
     .then(tasks => {
@@ -60,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Complete or delete tasks
+  // Handle complete and delete
   taskList.addEventListener("click", async (e) => {
     const taskId = e.target.dataset.id;
     if (!taskId) return;
@@ -68,13 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Complete task
     if (e.target.classList.contains("complete-btn")) {
       try {
-        await fetch(`${API_BASE}/tasks/${taskId}/complete`, { method: "PUT" });
-        e.target.parentElement.classList.toggle("completed");
+        const res = await fetch(`${API_BASE}/tasks/${taskId}/complete`, { method: "PUT" });
+        const updatedTask = await res.json();
 
+        const li = e.target.parentElement;
+        li.classList.toggle("completed", updatedTask.completed);
+
+        // Update calendar event color
         const event = calendar.getEventById(taskId);
-        if (event) {
-          event.setProp('color', e.target.parentElement.classList.contains('completed') ? 'gray' : '#66a6ff');
-        }
+        if (event) event.setProp('color', updatedTask.completed ? 'gray' : '#66a6ff');
       } catch (err) {
         console.error("Error completing task:", err);
       }
@@ -86,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
         await fetch(`${API_BASE}/tasks/${taskId}`, { method: "DELETE" });
         e.target.parentElement.remove();
 
+        // Remove from calendar
         const event = calendar.getEventById(taskId);
         if (event) event.remove();
       } catch (err) {
