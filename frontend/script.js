@@ -5,82 +5,95 @@ document.addEventListener("DOMContentLoaded", () => {
   const timeInput = document.getElementById("timeInput");
   const taskList = document.getElementById("taskList");
 
-  const API_URL = "https://schedulemanagerbackend-49kg.onrender.com"; // ✅ Your Render backend
+  const API_BASE = "https://schedulemanagerbackend-49kg.onrender.com";
 
-  const calendarEl = document.getElementById("calendar");
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
-    editable: false,
-    events: [],
-  });
-  calendar.render();
-
-  // Load tasks
-  fetch(`${API_URL}/tasks`)
+  // Load tasks from backend
+  fetch(`${API_BASE}/tasks`)
     .then(res => res.json())
     .then(tasks => {
       tasks.forEach(task => {
         addTaskToDOM(task);
         addTaskToCalendar(task);
       });
-    });
+    })
+    .catch(err => console.error("Error loading tasks:", err));
 
-  // Add task
+  // Add new task
   taskForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const taskText = taskInput.value.trim();
     if (!taskText) return;
 
-    const res = await fetch(`${API_URL}/tasks`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        name: taskText,
-        date: dateInput.value,
-        time: timeInput.value
-      })
-    });
+    try {
+      const res = await fetch(`${API_BASE}/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: taskText,
+          date: dateInput.value,
+          time: timeInput.value
+        })
+      });
 
-    const newTask = await res.json();
-    addTaskToDOM(newTask);
-    addTaskToCalendar(newTask);
+      const newTask = await res.json();
+      addTaskToDOM(newTask);
+      addTaskToCalendar(newTask);
 
-    taskInput.value = "";
-    dateInput.value = "";
-    timeInput.value = "";
+      taskInput.value = "";
+      dateInput.value = "";
+      timeInput.value = "";
+    } catch (err) {
+      console.error("Error adding task:", err);
+    }
   });
 
+  // Complete task
+  taskList.addEventListener("click", async (e) => {
+    if (e.target.classList.contains("complete-btn")) {
+      const taskId = e.target.dataset.id;
+      try {
+        await fetch(`${API_BASE}/tasks/${taskId}/complete`, { method: "PUT" });
+        e.target.parentElement.classList.toggle("completed");
+      } catch (err) {
+        console.error("Error completing task:", err);
+      }
+    }
+
+    // Delete task
+    if (e.target.classList.contains("delete-btn")) {
+      const taskId = e.target.dataset.id;
+      try {
+        await fetch(`${API_BASE}/tasks/${taskId}`, { method: "DELETE" });
+        e.target.parentElement.remove();
+      } catch (err) {
+        console.error("Error deleting task:", err);
+      }
+    }
+  });
+
+  // Function to add task to DOM
   function addTaskToDOM(task) {
     const li = document.createElement("li");
-    li.dataset.id = task._id;
-    li.innerHTML = `
-      <span>${task.name} (${task.date || 'No Date'} ${task.time || 'No Time'})</span>
-      <div class="task-buttons">
-        <button class="complete">✔</button>
-        <button class="delete">❌</button>
-      </div>
-    `;
+    li.textContent = `${task.name} - ${task.date} ${task.time}`;
+    li.className = task.completed ? "completed" : "";
 
-    li.querySelector(".complete").addEventListener("click", async () => {
-      await fetch(`${API_URL}/tasks/${task._id}/complete`, { method: "PUT" });
-      li.classList.toggle("completed");
-    });
+    const completeBtn = document.createElement("button");
+    completeBtn.textContent = "✔";
+    completeBtn.className = "complete-btn";
+    completeBtn.dataset.id = task._id;
 
-    li.querySelector(".delete").addEventListener("click", async () => {
-      await fetch(`${API_URL}/tasks/${task._id}`, { method: "DELETE" });
-      li.remove();
-      const event = calendar.getEventById(task._id);
-      if (event) event.remove();
-    });
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.dataset.id = task._id;
 
-    if (task.completed) li.classList.add("completed");
+    li.appendChild(completeBtn);
+    li.appendChild(deleteBtn);
     taskList.appendChild(li);
   }
 
+  // Dummy function for calendar integration
   function addTaskToCalendar(task) {
-    if (!task.date) return;
-    let start = task.date;
-    if (task.time) start += "T" + task.time;
-    calendar.addEvent({id: task._id, title: task.name, start});
+    // Implement your calendar logic here
   }
 });
