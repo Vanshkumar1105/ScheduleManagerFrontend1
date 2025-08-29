@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const timeInput = document.getElementById("timeInput");
   const taskList = document.getElementById("taskList");
 
+  const API_URL = "https://schedulemanagerbackend-49kg.onrender.com"; // ✅ Your Render backend
+
   const calendarEl = document.getElementById("calendar");
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
@@ -14,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   calendar.render();
 
   // Load tasks
-  fetch("/tasks")
+  fetch(`${API_URL}/tasks`)
     .then(res => res.json())
     .then(tasks => {
       tasks.forEach(task => {
@@ -29,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const taskText = taskInput.value.trim();
     if (!taskText) return;
 
-    const res = await fetch("/tasks", {
+    const res = await fetch(`${API_URL}/tasks`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
@@ -60,12 +62,12 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     li.querySelector(".complete").addEventListener("click", async () => {
-      await fetch(`/tasks/${task._id}/complete`, { method: "PUT" });
+      await fetch(`${API_URL}/tasks/${task._id}/complete`, { method: "PUT" });
       li.classList.toggle("completed");
     });
 
     li.querySelector(".delete").addEventListener("click", async () => {
-      await fetch(`/tasks/${task._id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/tasks/${task._id}`, { method: "DELETE" });
       li.remove();
       const event = calendar.getEventById(task._id);
       if (event) event.remove();
