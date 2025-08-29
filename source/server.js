@@ -1,12 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+require("dotenv").config(); // Load environment variables
 
 const app = express();
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect("mongodb://localhost:27017/tasks");
+// Connect to MongoDB Atlas
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("✅ Connected to MongoDB Atlas"))
+.catch(err => console.error("❌ MongoDB connection error:", err));
 
 // Task Schema
 const taskSchema = new mongoose.Schema({
@@ -17,19 +23,22 @@ const taskSchema = new mongoose.Schema({
 });
 const Task = mongoose.model("Task", taskSchema);
 
+// Correct path to frontend folder
 const frontendPath = path.join(__dirname, "../frontend");
 
-// ✅ Serve login page for root
+// Serve first page
 app.get("/", (req, res) => {
-  res.sendFile(path.join(frontendPath, "login.html"));
-});
-
-app.get("/tasks-page", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
-// ✅ Serve all other frontend files (CSS, JS, index.html, etc.)
+// Serve task page
+app.get("/tasks-page", (req, res) => {
+  res.sendFile(path.join(frontendPath, "task.html"));
+});
+
+// Serve static files (CSS, JS)
 app.use(express.static(frontendPath));
+
 // API endpoints
 app.get("/tasks", async (req, res) => {
   const tasks = await Task.find();
@@ -55,13 +64,8 @@ app.delete("/tasks/:id", async (req, res) => {
   res.json({ message: "Task deleted" });
 });
 
-// Use environment variable PORT if available, else default to 5000
-require('dotenv').config(); // Load .env variables
-
-
+// Start server
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI;
-
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
