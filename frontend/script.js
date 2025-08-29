@@ -7,6 +7,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const API_BASE = "https://schedulemanagerbackend-49kg.onrender.com";
 
+  // Initialize FullCalendar
+  const calendarEl = document.getElementById('calendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    height: 600,
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    }
+  });
+  calendar.render();
+
   // Load tasks from backend
   fetch(`${API_BASE}/tasks`)
     .then(res => res.json())
@@ -58,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
         await fetch(`${API_BASE}/tasks/${taskId}/complete`, { method: "PUT" });
         e.target.parentElement.classList.toggle("completed");
 
-        // Update calendar event (optional: change color for completed)
         const event = calendar.getEventById(taskId);
         if (event) event.setProp('color', e.target.parentElement.classList.contains('completed') ? 'gray' : '');
       } catch (err) {
@@ -72,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
         await fetch(`${API_BASE}/tasks/${taskId}`, { method: "DELETE" });
         e.target.parentElement.remove();
 
-        // Remove from calendar
         const event = calendar.getEventById(taskId);
         if (event) event.remove();
       } catch (err) {
@@ -112,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
       id: task._id,
       title: task.name,
       start,
-      color: task.completed ? 'gray' : '' // completed tasks gray
+      color: task.completed ? 'gray' : ''
     });
   }
 });
