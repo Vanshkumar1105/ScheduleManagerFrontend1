@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
         li.classList.toggle("completed", updatedTask.completed);
 
         const event = calendar.getEventById(taskId);
-        if (event) event.setProp("color", updatedTask.completed ? "gray" : "#66a6ff");
+        if (event) event.setProp("color", updatedTask.completed ? "gray" : "#e0e3e9ff");
       } catch (err) {
         console.error("Error completing task:", err);
       }
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "✔";
     completeBtn.className = "complete-btn";
-    completeBtn.dataset.id = task._id;
+    completeBtn.dataset.id = task._id.toString();
 
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "🗑";
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (task.time) start += "T" + task.time;
 
     calendar.addEvent({
-      id: task._id,
+      id: task._id.toString(),
       title: task.name,
       start,
       color: task.completed ? "gray" : "#66a6ff",
